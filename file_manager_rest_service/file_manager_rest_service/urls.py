@@ -16,15 +16,19 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
-from quickstart import views
+from file_manager_v1 import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'file', views.FileViewSet)
+router.register(r'files', views.FileViewSet)
+router.register(r'tag', views.TagViewSet)
+router.register(r'course_x_tag', views.CourseXTagViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace = 'rest_framework')),
-    url(r'^admin/', admin.site.urls)
+    url(r'^admin/', admin.site.urls),
+    url(r'^file/(?P<pk>[0-9]+)/$', views.FileDetail.as_view()),
+    url(r'^directory_tree/', views.CourseDirectoryTreeDetail.as_view())
 ]
