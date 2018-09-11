@@ -22,13 +22,15 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'files', views.FileViewSet)
-router.register(r'tag', views.TagViewSet)
+router.register(r'tags', views.TagViewSet)
 router.register(r'course_x_tag', views.CourseXTagViewSet)
+router.register(r'courses', views.CourseViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace = 'rest_framework')),
     url(r'^admin/', admin.site.urls),
-    url(r'^file/(?P<pk>[0-9]+)/$', views.FileDetail.as_view()),
+    url(r'^file_detail/(?P<pk>[0-9]+)/$', views.FileDetail.as_view()),
+    url(r'^move_file/(?P<pk>[0-9]+)/$', views.MoveFileView.as_view()),
     url(r'^directory_tree/', views.CourseDirectoryTreeDetail.as_view())
 ]

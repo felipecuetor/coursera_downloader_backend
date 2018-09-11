@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 from django.shortcuts import render
 from django.contrib.auth.models import User,Group
-from file_manager_v1.models import File, Tag, CourseXTag
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, CourseXTagSerializer
+from file_manager_v1.models import File, Tag, CourseXTag, Course
+from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, CourseXTagSerializer, CourseSerializer
 from file_manager_utils import directory_recursive_generator
 import json
 
@@ -31,7 +31,16 @@ class FileDetail(APIView):
 
     def put(self, request, pk, format=None):
         file = self.get_object(pk)
-        serializer = FileSerializer(file, data=request.data)
+        original_file_serializer = FileSerializer(file)
+        print request.data
+        print original_file_serializer.data
+        file_new_location = {}
+        file_new_location["file_course_location"]=request.data["file_course_location"]
+        file_new_location["id"] = original_file_serializer.data["id"]
+        file_new_location["file_directory"] = original_file_serializer.data["file_directory"]
+        file_new_location["file_name"] = original_file_serializer.data["file_name"]
+        print file_new_location
+        serializer = FileSerializer(file, data=file_new_location)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -41,6 +50,32 @@ class FileDetail(APIView):
         file = self.get_object(pk)
         file.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class MoveFileView(APIView):
+    """
+    Retrieve, update or delete a file instance.
+    """
+    def get_object(self, pk):
+        try:
+            return File.objects.get(pk=pk)
+        except File.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        file = self.get_object(pk)
+        original_file_serializer = FileSerializer(file)
+        file_location = request.GET.get('file_course_location')
+        file_new_location = {}
+        file_new_location["file_course_location"]=file_location
+        file_new_location["id"] = original_file_serializer.data["id"]
+        file_new_location["file_directory"] = original_file_serializer.data["file_directory"]
+        file_new_location["file_name"] = original_file_serializer.data["file_name"]
+        print file_new_location
+        serializer = FileSerializer(file, data=file_new_location)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CourseDirectoryTreeDetail(APIView):
     """
@@ -55,6 +90,7 @@ class CourseDirectoryTreeDetail(APIView):
             file_course_location_text = serializer.data["file_course_location"]
             file_course_location = file_course_location_text.split(">>>")
             current_directory_level = 0
+            print file_course_location_text
             json_directory = directory_recursive_generator(json_directory=json_directory, file_object=serializer.data, directory_path=file_course_location, current_directory_level=current_directory_level)
             json_directory_wrap = {"directory":json_directory}
         return Response(json_directory_wrap)
@@ -78,3 +114,7 @@ class TagViewSet(viewsets.ModelViewSet):
 class CourseXTagViewSet(viewsets.ModelViewSet):
     queryset = CourseXTag.objects.all()
     serializer_class = CourseXTagSerializer
+
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer

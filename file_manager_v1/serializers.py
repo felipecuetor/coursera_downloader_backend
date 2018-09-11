@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from file_manager_v1.models import File, Tag, CourseXTag
+from file_manager_v1.models import File, Tag, CourseXTag, Course
 from rest_framework import serializers
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -15,12 +15,17 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class FileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = File
-        fields = ('file_name','file_directory','file_course_location')
+        fields = ('id','file_name','file_directory','file_course_location')
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag
         fields = ('tag_name', 'tag_importance')
+
+class CourseSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Course
+        fields = ('course_name','course_download_date', 'course_revised')
 
 class CourseXTagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
