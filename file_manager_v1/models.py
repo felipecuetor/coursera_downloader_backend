@@ -37,6 +37,6 @@ class Tag(models.Model):
 # Create your models here.
 class CourseXTag(models.Model):
     #Original file name found in cursera (Can be modified?)
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course_id = models.IntegerField()
     #The files location within a course, works like a directory
-    tag_id = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    tag_id = models.IntegerField()
