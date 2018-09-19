@@ -32,5 +32,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^file_detail/(?P<pk>[0-9]+)/$', views.FileDetail.as_view()),
     url(r'^move_file/(?P<pk>[0-9]+)/$', views.MoveFileView.as_view()),
-    url(r'^directory_tree/', views.CourseDirectoryTreeDetail.as_view())
+    url(r'^directory_tree/', views.CourseDirectoryTreeDetail.as_view()),
+    url(r'^download_course/', views.downloadCourse)
 ]

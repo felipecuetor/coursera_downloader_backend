@@ -1,5 +1,4 @@
 import os
-from coursera import coursera_dl
 
 def get_array_keys(array):
     keys = []
@@ -38,7 +37,7 @@ def directory_recursive_generator(json_directory, file_object, directory_path, c
 
     return json_directory_resp
 
-def course_static_directory_analyzer(course_path, recursize_directory_path, recursive_location_path ):
+def course_static_directory_analyzer_remote(course_path, recursize_directory_path, recursive_location_path ):
     course_directory = os.listdir(course_path)
     for element in course_directory:
         element=str(element)
@@ -50,8 +49,8 @@ def course_static_directory_analyzer(course_path, recursize_directory_path, recu
                 folder_name_division=split1[0]+">>>"+element[3:]
             else:
                 folder_name_division=element
-            course_static_directory_analyzer(dir2+"/", recursize_directory_path+">>>"+str(element), recursive_location_path+">>>"+folder_name_division)
-        elif os.path.isfile(dir2):
+            course_static_directory_analyzer_remote(dir2+"/", recursize_directory_path+">>>"+str(element), recursive_location_path+">>>"+folder_name_division)
+        else:
             file_name_division=""
             file_name=""
             split1 = element.split("_")
@@ -61,8 +60,26 @@ def course_static_directory_analyzer(course_path, recursize_directory_path, recu
             else:
                 file_name_division=element
                 file_name=element
+            file_name = element
+            file_directory_path = recursize_directory_path+">>>"+str(element)
+            file_location_path = recursive_location_path+">>>"+file_name_division
+            url = 'http://localhost:8000/files/'
+            payload = {
+            'file_name': file_name,
+            'file_course_location': file_location_path,
+            'file_directory': file_directory_path
+            }
+            #print file_namer
+            r = requests.post(url, data=payload)
 
-def download_course():
-    course_name = raw_input("Course name: ")
-    user = raw_input("Coursera user: ")
-    password = raw_input("Coursera password: ")
+def course_element_generator(course_name, course_download_date, course_revised, course_download_available, course_error):
+    url = 'http://localhost:8000/courses/'
+    payload = {
+        'course_name': course_name,
+        'course_download_date': course_download_date,
+        'course_revised': course_revised,
+        'course_download_available':course_download_available,
+        'course_error':course_error
+    }
+    #print file_namer
+    r = requests.post(url, data=payload)

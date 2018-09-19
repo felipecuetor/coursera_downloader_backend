@@ -111,5 +111,6 @@ dmypy.json
 
 
 # coursera_downloader_backend
-.data/
 .data_backup/
+*.json
+*.conf

@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from file_manager_v1.models import File, Tag, CourseXTag, Course
 from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, CourseXTagSerializer, CourseSerializer
-from file_manager_utils import directory_recursive_generator
+from utils.file_manager_utils import directory_recursive_generator
 import json
 
 # Create your views here.
@@ -32,14 +32,11 @@ class FileDetail(APIView):
     def put(self, request, pk, format=None):
         file = self.get_object(pk)
         original_file_serializer = FileSerializer(file)
-        print request.data
-        print original_file_serializer.data
         file_new_location = {}
         file_new_location["file_course_location"]=request.data["file_course_location"]
         file_new_location["id"] = original_file_serializer.data["id"]
         file_new_location["file_directory"] = original_file_serializer.data["file_directory"]
         file_new_location["file_name"] = original_file_serializer.data["file_name"]
-        print file_new_location
         serializer = FileSerializer(file, data=file_new_location)
         if serializer.is_valid():
             serializer.save()
@@ -50,6 +47,18 @@ class FileDetail(APIView):
         file = self.get_object(pk)
         file.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+def downloadCourse(request):
+    print(request.method)
+    if request.method == 'OPTIONS':
+        return Response(status=status.HTTP_200_OK)
+    if request.method == 'POST':
+        print("Download Request recieved")
+        course_name = request.data["course_name"]
+        username = request.data["username"]
+        password = request.data["password"]
+        course_download_thread_generator(username, password, course_name, 1)
+        return Response(status=status.HTTP_200_OK)
 
 class MoveFileView(APIView):
     """
@@ -70,7 +79,6 @@ class MoveFileView(APIView):
         file_new_location["id"] = original_file_serializer.data["id"]
         file_new_location["file_directory"] = original_file_serializer.data["file_directory"]
         file_new_location["file_name"] = original_file_serializer.data["file_name"]
-        print file_new_location
         serializer = FileSerializer(file, data=file_new_location)
         if serializer.is_valid():
             serializer.save()
@@ -90,7 +98,6 @@ class CourseDirectoryTreeDetail(APIView):
             file_course_location_text = serializer.data["file_course_location"]
             file_course_location = file_course_location_text.split(">>>")
             current_directory_level = 0
-            print file_course_location_text
             json_directory = directory_recursive_generator(json_directory=json_directory, file_object=serializer.data, directory_path=file_course_location, current_directory_level=current_directory_level)
             json_directory_wrap = {"directory":json_directory}
         return Response(json_directory_wrap)

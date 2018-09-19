@@ -5,15 +5,22 @@ from django.db import models
 
 # Create your models here.
 class Course(models.Model):
-    #Original course name
+    #Original course identafier name
     course_name = models.CharField(max_length=1000, unique=True)
-    course_download_date = models.CharField(max_length=1000, unique=True)
-    course_revised = models.BooleanField(default=False, unique=True)
+    #When was the course downloaded
+    course_download_date = models.CharField(max_length=1000)
+    #Has the course been revised by a student
+    course_revised = models.BooleanField(default=False)
+    #Is the course available as a zip file for download
+    course_download_available = models.BooleanField(default=False)
+    #Is the course available as a zip file for download
+    course_error = models.BooleanField(default=False)
 
-# Create your models here.
+# This file system does not allow for folders to be created.
+# Files can be grouped together by giving them the same file_course_location up to the file name
 class File(models.Model):
     #Original file name found in cursera (Can be modified?)
-    file_name = models.CharField(max_length=1000, unique=True)
+    file_name = models.CharField(max_length=1000)
     #The files location within a course, works like a directory
     file_course_location = models.CharField(max_length=1000, default="", unique=True)
     #The real location the file can be found within the course location (Its a relative directory)

@@ -20,14 +20,14 @@ class FileSerializer(serializers.HyperlinkedModelSerializer):
 class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag
-        fields = ('tag_name', 'tag_importance')
+        fields = ('id','tag_name', 'tag_importance')
 
 class CourseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Course
-        fields = ('course_name','course_download_date', 'course_revised')
+        fields = ('id', 'course_name', 'course_download_date', 'course_revised', 'course_download_available', 'course_error')
 
 class CourseXTagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CourseXTag
-        fields = ('course_id','tag_id')
+        fields = ('id','course_id','tag_id')

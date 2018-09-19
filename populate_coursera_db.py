@@ -1,5 +1,9 @@
 import os
 import requests
+import datetime
+
+#Allows you to manually execute the data generation algorithm that analyzes all courses within the data folder in the root of the directory.
+#This algorithm recursivly goes deeper and deeper within the folder system searching for the files.
 
 def course_static_directory_analyzer_remote(course_path, recursize_directory_path, recursive_location_path ):
     course_directory = os.listdir(course_path)
@@ -37,6 +41,18 @@ def course_static_directory_analyzer_remote(course_path, recursize_directory_pat
             r = requests.post(url, data=payload)
 
 
+def course_element_generator(course_name, course_download_date, course_revised, course_download_available, course_error):
+    url = 'http://localhost:8000/courses/'
+    payload = {
+        'course_name': course_name,
+        'course_download_date': course_download_date,
+        'course_revised': course_revised,
+        'course_download_available':course_download_available,
+        'course_error':course_error
+    }
+    #print file_namer
+    r = requests.post(url, data=payload)
+
 dir1 = "./data/"
 course_directory = os.listdir(dir1)
 
@@ -45,3 +61,4 @@ for element in course_directory:
     if os.path.isdir(dir2):
         #print dir2
         course_static_directory_analyzer_remote(dir2+"/", element, element)
+        course_element_generator(element, datetime.datetime.now(), False, False, False)
