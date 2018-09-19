@@ -23,7 +23,7 @@ router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'files', views.FileViewSet)
 router.register(r'tags', views.TagViewSet)
-router.register(r'course_x_tag', views.CourseXTagViewSet)
+router.register(r'course_x_tag', views.Course_TagViewSet)
 router.register(r'courses', views.CourseViewSet)
 
 urlpatterns = [
@@ -33,5 +33,6 @@ urlpatterns = [
     url(r'^file_detail/(?P<pk>[0-9]+)/$', views.FileDetail.as_view()),
     url(r'^move_file/(?P<pk>[0-9]+)/$', views.MoveFileView.as_view()),
     url(r'^directory_tree/', views.CourseDirectoryTreeDetail.as_view()),
-    url(r'^download_course/', views.downloadCourse)
+    url(r'^download_course/', views.downloadCourse),
+    url(r'^course_tags/', views.SpecificCourseTagsView.as_view())
 ]

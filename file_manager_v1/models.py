@@ -35,8 +35,8 @@ class Tag(models.Model):
 
 
 # Create your models here.
-class CourseXTag(models.Model):
+class Course_Tag(models.Model):
     #Original file name found in cursera (Can be modified?)
-    course_id = models.IntegerField()
+    course_id_number = models.IntegerField()
     #The files location within a course, works like a directory
-    tag_id = models.IntegerField()
+    tag_id_number = models.IntegerField()

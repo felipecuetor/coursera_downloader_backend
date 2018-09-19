@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from file_manager_v1.models import File, Tag, CourseXTag, Course
-from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, CourseXTagSerializer, CourseSerializer
+from file_manager_v1.models import File, Tag, Course_Tag, Course
+from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Course_TagSerializer, CourseSerializer
 from utils.file_manager_utils import directory_recursive_generator
 import json
 
@@ -85,6 +85,21 @@ class MoveFileView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class SpecificCourseTagsView(APIView):
+    """
+    Retrieve, update or delete a Course_Tag instance.
+    """
+    def get_all_course_tags(self, course_id):
+        try:
+            return Course_Tag.objects.filter(course_id_number=course_id)
+        except:
+            raise Http404
+
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        course_x_tag = self.get_all_course_tags(course_id)
+        return Response(course_x_tag.values())
+
 class CourseDirectoryTreeDetail(APIView):
     """
     Retrieve, update or delete the complete directory of files
@@ -118,9 +133,9 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
-class CourseXTagViewSet(viewsets.ModelViewSet):
-    queryset = CourseXTag.objects.all()
-    serializer_class = CourseXTagSerializer
+class Course_TagViewSet(viewsets.ModelViewSet):
+    queryset = Course_Tag.objects.all()
+    serializer_class = Course_TagSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
