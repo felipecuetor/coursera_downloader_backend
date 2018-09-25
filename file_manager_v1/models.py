@@ -25,6 +25,8 @@ class File(models.Model):
     file_course_location = models.CharField(max_length=1000, default="", unique=True)
     #The real location the file can be found within the course location (Its a relative directory)
     file_directory = models.CharField(max_length=1000, unique=True)
+    #The course the file
+    course_id = models.IntegerField()
 
 # Create your models here.
 class Tag(models.Model):
@@ -40,3 +42,15 @@ class Course_Tag(models.Model):
     course_id_number = models.IntegerField()
     #The files location within a course, works like a directory
     tag_id_number = models.IntegerField()
+    class Meta:
+        unique_together = ("course_id_number", "tag_id_number")
+
+
+# Create your models here.
+class CourseLanguage(models.Model):
+    #Original file name found in cursera (Can be modified?)
+    course_id = models.IntegerField()
+    #The files location within a course, works like a directory
+    language = models.CharField(max_length=100)
+    class Meta:
+        unique_together = (("course_id", "language"),)

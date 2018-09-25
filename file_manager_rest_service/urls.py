@@ -25,6 +25,7 @@ router.register(r'files', views.FileViewSet)
 router.register(r'tags', views.TagViewSet)
 router.register(r'course_x_tag', views.Course_TagViewSet)
 router.register(r'courses', views.CourseViewSet)
+router.register(r'courselanguage', views.CourseLanguageViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
@@ -34,5 +35,9 @@ urlpatterns = [
     url(r'^move_file/(?P<pk>[0-9]+)/$', views.MoveFileView.as_view()),
     url(r'^directory_tree/', views.CourseDirectoryTreeDetail.as_view()),
     url(r'^download_course/', views.downloadCourse),
-    url(r'^course_tags/', views.SpecificCourseTagsView.as_view())
+    url(r'^course_tags/', views.SpecificCourseTagsView.as_view()),
+    url(r'^course_languages/', views.SpecificCourseLanguagesView.as_view()),
+    url(r'^course_files/', views.SpecificCourseFilesView.as_view()),
+    url(r'^course_lang_files/', views.SpecificCourseLanguagesFilesView.as_view())
+
 ]

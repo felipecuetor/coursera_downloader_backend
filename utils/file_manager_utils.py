@@ -65,11 +65,10 @@ def course_static_directory_analyzer_remote(course_path, recursize_directory_pat
             file_location_path = recursive_location_path+">>>"+file_name_division
             url = 'http://localhost:8000/files/'
             payload = {
-            'file_name': file_name,
-            'file_course_location': file_location_path,
-            'file_directory': file_directory_path
+                'file_name': file_name,
+                'file_course_location': file_location_path,
+                'file_directory': file_directory_path
             }
-            #print file_namer
             r = requests.post(url, data=payload)
 
 def course_element_generator(course_name, course_download_date, course_revised, course_download_available, course_error):
@@ -83,3 +82,14 @@ def course_element_generator(course_name, course_download_date, course_revised, 
     }
     #print file_namer
     r = requests.post(url, data=payload)
+
+def detect_language_in_name(text, course_id):
+    period_split = text.split(".")
+    if(len(period_split)==3):
+        url = 'http://localhost:8000/courselanguage/'
+        payload = {
+            'course_id': course_id,
+            'language': period_split[1]
+        }
+        #print file_namer
+        r = requests.post(url, data=payload)

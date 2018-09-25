@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from file_manager_v1.models import File, Tag, Course_Tag, Course
-from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Course_TagSerializer, CourseSerializer
+from file_manager_v1.models import File, Tag, Course_Tag, Course, CourseLanguage
+from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Course_TagSerializer, CourseSerializer,CourseLanguageSerializer
 from utils.file_manager_utils import directory_recursive_generator
 import json
 
@@ -98,7 +98,76 @@ class SpecificCourseTagsView(APIView):
     def get(self, request, format=None):
         course_id = request.GET.get('course_id')
         course_x_tag = self.get_all_course_tags(course_id)
-        return Response(course_x_tag.values())
+        json_response=[]
+        for tag in course_x_tag.values():
+            tag_query=Tag.objects.filter(id=tag["tag_id_number"])
+            tag_object={
+                "id":tag["id"],
+                "tag_name":tag_query.values()[0]["tag_name"]
+            }
+            json_response.append(tag_object)
+        print json_response
+        return Response(json_response)
+
+class SpecificCourseLanguagesView(APIView):
+    """
+    Retrieve, update or delete a Course_Tag instance.
+    """
+    def get_all_course_langs(self, course_id):
+        try:
+            return CourseLanguage.objects.filter(course_id=course_id)
+        except:
+            raise Http404
+
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        course_languages = self.get_all_course_langs(course_id)
+        return Response(course_languages.values())
+
+class SpecificCourseLanguagesFilesView(APIView):
+    """
+    Retrieve, update or delete a Course_Tag instance.
+    """
+    def get_all_course_lang_files(self, course_id,language):
+        try:
+            language_sec = "."+language+"."
+            return File.objects.filter(course_id=course_id).filter(file_name__contains=language_sec)
+        except:
+            raise Http404
+
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        language = request.GET.get('language')
+        files_languages = self.get_all_course_lang_files(course_id, language)
+        return Response(files_languages.values())
+
+class SpecificCourseFilesView(APIView):
+    """
+    Retrieve, update or delete a Course_Tag instance.
+    """
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        all_files = File.objects.filter(course_id=course_id)
+        return Response(all_files.values())
+
+class SpecificCourseTreeView(APIView):
+    """
+    Retrieve, update or delete a Course_Tag instance.
+    """
+
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        all_files = File.objects.filter(course_id=course_id)
+        json_directory_wrap = {}
+        json_directory = []
+        for file in all_files:
+            serializer = FileSerializer(file)
+            file_course_location_text = serializer.data["file_course_location"]
+            file_course_location = file_course_location_text.split(">>>")
+            current_directory_level = 0
+            json_directory = directory_recursive_generator(json_directory=json_directory, file_object=serializer.data, directory_path=file_course_location, current_directory_level=current_directory_level)
+            json_directory_wrap = {"directory":json_directory}
+        return Response(json_directory_wrap)
 
 class CourseDirectoryTreeDetail(APIView):
     """
@@ -140,3 +209,7 @@ class Course_TagViewSet(viewsets.ModelViewSet):
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+
+class CourseLanguageViewSet(viewsets.ModelViewSet):
+    queryset = CourseLanguage.objects.all()
+    serializer_class = CourseLanguageSerializer
