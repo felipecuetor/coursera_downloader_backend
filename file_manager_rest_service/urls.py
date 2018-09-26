@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^course_tags/', views.SpecificCourseTagsView.as_view()),
     url(r'^course_languages/', views.SpecificCourseLanguagesView.as_view()),
     url(r'^course_files/', views.SpecificCourseFilesView.as_view()),
-    url(r'^course_lang_files/', views.SpecificCourseLanguagesFilesView.as_view())
+    url(r'^course_lang_files/', views.SpecificCourseLanguagesFilesView.as_view()),
+    url(r'^course_directory_tree/', views.SpecificCourseTreeView.as_view()),
 
 ]
