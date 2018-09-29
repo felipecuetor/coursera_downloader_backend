@@ -22,9 +22,10 @@ def course_download_thread_generator(user, password, course_name, thread_number)
 			self.password_thread = password_thread
 			self.course_name_thread = course_name_thread
 		def run(self):
+			path="./data/"+self.course_name_thread
 			simple_course_download(self.user_thread, self.password_thread ,self.course_name_thread, "./data/")
-			course_static_directory_analyzer_remote(path)
-			course_element_generator(self.course_name_thread, datetime.datetime.now(), False, False, False)
+			#course_static_directory_analyzer_remote(path)
+			#course_element_generator(self.course_name_thread, datetime.datetime.now(), False, False, False)
 			#zip_course(path)
 
 	# Create new threads
