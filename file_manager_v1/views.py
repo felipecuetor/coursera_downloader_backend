@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from file_manager_v1.models import File, Tag, Course_Tag, Course, CourseLanguage
-from file_manager_v1.serializers import UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Course_TagSerializer, CourseSerializer,CourseLanguageSerializer
+from file_manager_v1.models import File, Tag, Lesson_Tag, Course, CourseLanguage, Lesson
+from file_manager_v1.serializers import LessonSerializer, UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Lesson_TagSerializer, CourseSerializer,CourseLanguageSerializer
 from utils.file_manager_utils import directory_recursive_generator
 import json
 
@@ -85,21 +85,21 @@ class MoveFileView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SpecificCourseTagsView(APIView):
+class SpecificLessonTagsView(APIView):
     """
-    Retrieve, update or delete a Course_Tag instance.
+    Retrieve, update or delete a Lesson_Tag instance.
     """
-    def get_all_course_tags(self, course_id):
+    def get_all_lesson_tags(self, lesson_id):
         try:
-            return Course_Tag.objects.filter(course_id_number=course_id)
+            return Lesson_Tag.objects.filter(lesson_id_number=lesson_id)
         except:
             raise Http404
 
     def get(self, request, format=None):
-        course_id = request.GET.get('course_id')
-        course_x_tag = self.get_all_course_tags(course_id)
+        lesson_id = request.GET.get('lesson_id')
+        lesson_x_tag = self.get_all_lesson_tags(lesson_id)
         json_response=[]
-        for tag in course_x_tag.values():
+        for tag in lesson_x_tag.values():
             tag_query=Tag.objects.filter(id=tag["tag_id_number"])
             tag_object={
                 "id":tag["id"],
@@ -186,6 +186,35 @@ class CourseDirectoryTreeDetail(APIView):
             json_directory_wrap = {"directory":json_directory}
         return Response(json_directory_wrap)
 
+class CourseLessonsDetail(APIView):
+    """
+    Retrieve, update or delete the complete directory of files
+    """
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        all_course_lessons = Lesson.objects.all().filter(course_id=course_id).values()
+        serialized_lesson_list = []
+        for lesson in all_course_lessons:
+            serialized_lesson_list.append(LessonSerializer(lesson).data)
+        return Response(serialized_lesson_list)
+
+class SetNextLessonDetail(APIView):
+    def get(self, request, format=None):
+        lesson_id = request.GET.get('lesson_id')
+        next_lesson_id = request.GET.get('next_lesson_id')
+        first_lesson = Lesson.objects.get(pk=lesson_id)
+        serialized_lesson_data = LessonSerializer(first_lesson).data
+        lesson_new_next = {}
+        lesson_new_next["next_lesson_id"] = next_lesson_id
+        lesson_new_next["lesson_name"] = serialized_lesson_data["lesson_name"]
+        lesson_new_next["lesson_identifier"] = serialized_lesson_data["lesson_identifier"]
+        lesson_new_next["course_id"] = serialized_lesson_data["course_id"]
+        serializer = LessonSerializer(first_lesson, data=lesson_new_next)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
@@ -202,9 +231,9 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
-class Course_TagViewSet(viewsets.ModelViewSet):
-    queryset = Course_Tag.objects.all()
-    serializer_class = Course_TagSerializer
+class Lesson_TagViewSet(viewsets.ModelViewSet):
+    queryset = Lesson_Tag.objects.all()
+    serializer_class = Lesson_TagSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -213,3 +242,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 class CourseLanguageViewSet(viewsets.ModelViewSet):
     queryset = CourseLanguage.objects.all()
     serializer_class = CourseLanguageSerializer
+
+class LessonViewSet(viewsets.ModelViewSet):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer

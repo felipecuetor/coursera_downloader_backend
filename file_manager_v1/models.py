@@ -27,6 +27,8 @@ class File(models.Model):
     file_directory = models.CharField(max_length=1000, unique=True)
     #The course the file
     course_id = models.IntegerField()
+    #The lesson the file is associated with
+    lesson_id = models.IntegerField()
 
 # Create your models here.
 class Tag(models.Model):
@@ -37,13 +39,13 @@ class Tag(models.Model):
 
 
 # Create your models here.
-class Course_Tag(models.Model):
+class Lesson_Tag(models.Model):
     #Original file name found in cursera (Can be modified?)
-    course_id_number = models.IntegerField()
+    lesson_id_number = models.IntegerField()
     #The files location within a course, works like a directory
     tag_id_number = models.IntegerField()
     class Meta:
-        unique_together = ("course_id_number", "tag_id_number")
+        unique_together = ("lesson_id_number", "tag_id_number")
 
 
 # Create your models here.
@@ -54,3 +56,15 @@ class CourseLanguage(models.Model):
     language = models.CharField(max_length=100)
     class Meta:
         unique_together = (("course_id", "language"),)
+
+
+#File group
+class Lesson(models.Model):
+    #The name of the lesson
+    lesson_name = models.CharField(max_length=500)
+    #Lesson String identifier
+    lesson_identifier = models.CharField(max_length=500)
+    #In a ordered list each lesson has a successor. The last object has a next_lesson=0
+    next_lesson_id = models.IntegerField()
+    #The course the lesson is associated to
+    course_id = models.IntegerField()
