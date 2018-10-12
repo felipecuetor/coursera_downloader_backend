@@ -85,10 +85,27 @@ class MoveFileView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class SpecificCourseToggleRevised(APIView):
+    def get_object(self, course_id):
+        try:
+            return Course.objects.get(pk=course_id)
+        except Course.DoesNotExist:
+            raise Http404
+
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        course = self.get_object(course_id)
+        original_course_serializer = CourseSerializer(course)
+        change_course = original_course_serializer.data
+        change_course["course_revised"] = not change_course["course_revised"]
+        serializer = CourseSerializer(course, data=change_course)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class SpecificLessonTagsView(APIView):
-    """
-    Retrieve, update or delete a Lesson_Tag instance.
-    """
+    #Retrieve, update or delete a Lesson_Tag instance.
     def get_all_lesson_tags(self, lesson_id):
         try:
             return Lesson_Tag.objects.filter(lesson_id_number=lesson_id)
@@ -143,11 +160,20 @@ class SpecificCourseLanguagesFilesView(APIView):
 
 class SpecificCourseFilesView(APIView):
     """
-    Retrieve, update or delete a Course_Tag instance.
+    Retrieve all course files
     """
     def get(self, request, format=None):
         course_id = request.GET.get('course_id')
         all_files = File.objects.filter(course_id=course_id)
+        return Response(all_files.values())
+
+class SpecificLessonFilesView(APIView):
+    """
+    Retrieve all lesson files
+    """
+    def get(self, request, format=None):
+        lesson_id = request.GET.get('lesson_id')
+        all_files = File.objects.filter(lesson_id=lesson_id)
         return Response(all_files.values())
 
 class SpecificCourseTreeView(APIView):
@@ -158,6 +184,25 @@ class SpecificCourseTreeView(APIView):
     def get(self, request, format=None):
         course_id = request.GET.get('course_id')
         all_files = File.objects.filter(course_id=course_id)
+        json_directory_wrap = {}
+        json_directory = []
+        for file in all_files:
+            serializer = FileSerializer(file)
+            file_course_location_text = serializer.data["file_course_location"]
+            file_course_location = file_course_location_text.split(">>>")
+            current_directory_level = 0
+            json_directory = directory_recursive_generator(json_directory=json_directory, file_object=serializer.data, directory_path=file_course_location, current_directory_level=current_directory_level)
+            json_directory_wrap = {"directory":json_directory}
+        return Response(json_directory_wrap)
+
+class SpecificLessonTreeView(APIView):
+    """
+    Retrieve
+    """
+
+    def get(self, request, format=None):
+        lesson_id = request.GET.get('lesson_id')
+        all_files = File.objects.filter(lesson_id=lesson_id)
         json_directory_wrap = {}
         json_directory = []
         for file in all_files:

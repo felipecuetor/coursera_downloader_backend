@@ -41,7 +41,9 @@ urlpatterns = [
     url(r'^course_files/', views.SpecificCourseFilesView.as_view()),
     url(r'^course_lang_files/', views.SpecificCourseLanguagesFilesView.as_view()),
     url(r'^course_directory_tree/', views.SpecificCourseTreeView.as_view()),
+    url(r'^lesson_directory_tree/', views.SpecificLessonTreeView.as_view()),
     url(r'^course_lessons/', views.CourseLessonsDetail.as_view()),
     url(r'^set_next_lesson/', views.SetNextLessonDetail.as_view()),
-
+    url(r'^lesson_files/', views.SpecificLessonFilesView.as_view()),
+    url(r'^course_toggle_revised/', views.SpecificCourseToggleRevised.as_view()),
 ]

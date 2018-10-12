@@ -20,7 +20,7 @@ def course_static_directory_analyzer_remote(course_path, recursize_directory_pat
                 folder_name_division=split1[0]+">>>"+element[3:]
             else:
                 folder_name_division=element
-            existing_lessons = course_static_directory_analyzer_remote(dir2+"/", recursize_directory_path+">>>"+str(element), recursive_location_path+">>>"+folder_name_division, course_id, existing_lessons, existing_lessons_files)
+            existing_lessons = course_static_directory_analyzer_remote(dir2+"/", recursize_directory_path+">>>"+str(element), recursive_location_path+">>>"+folder_name_division, course_id, existing_lessons, existing_lessons_files)[0]
         else:
             file_name_division=""
             file_name=""
@@ -53,7 +53,7 @@ def course_static_directory_analyzer_remote(course_path, recursize_directory_pat
             existing_lessons_in_directory[lesson_identifier]={"lesson_name":lesson_name,"lesson_identifier":lesson_identifier}
     existing_lessons.append(existing_lessons_in_directory)
     existing_lessons_files.append(existing_lessons_in_directory_files)
-    return existing_lessons
+    return (existing_lessons, existing_lessons_files)
 
 
 def course_element_generator(course_name, course_download_date, course_revised, course_download_available, course_error):
@@ -77,11 +77,11 @@ def detect_language_in_name(text, course_id):
             'language': period_split[1]
         }
         r = requests.post(url, data=payload)
-        print r.content
+
 
 def find_course_languages(course_info):
     url = 'http://localhost:8080/course_files/?course_id='+str(course_info["id"])
-    print(url)
+
     r = requests.get(url)
     course_files = r.content
     for file in json.loads(course_files):
@@ -92,7 +92,7 @@ def dump_file_list(file_list, course_id, lesson_id):
         url = 'http://localhost:8080/files/'
         payload = file
         payload["lesson_id"] = lesson_id
-        print payload
+
         r = requests.post(url, data=payload)
 
 def dump_lesson_list(existing_lessons,course_id, existing_lessons_files):
@@ -100,7 +100,7 @@ def dump_lesson_list(existing_lessons,course_id, existing_lessons_files):
     directory_lesson_file_list = list(reversed(existing_lessons_files))
     previous_element_id = 0
     for id, current in enumerate(current_list):
-        existing_lessons_in_directory_keys=list(reversed(current.keys()))
+        existing_lessons_in_directory_keys=list(reversed(sorted(current.keys())))
         lesson_file_list = directory_lesson_file_list[id]
         for key in existing_lessons_in_directory_keys:
             current_lesson = current[key]
@@ -122,11 +122,11 @@ for element in course_directory:
     existing_lessons=[]
     existing_lessons_files=[]
     if os.path.isdir(dir2):
-        print("Course post")
         course_info = json.loads(course_element_generator(element, datetime.datetime.now(), False, False, False))
-        print("File post")
+        print("Course post:"+str(course_info))
         lessons_files_tuple = course_static_directory_analyzer_remote(dir2+"/", element, element, course_info["id"],existing_lessons,existing_lessons_files)
-        print("Lesson post")
+        print("File post")
         dump_lesson_list(existing_lessons,course_info["id"],existing_lessons_files)
-        print("language post")
+        print("Lesson post")
         find_course_languages(course_info)
+        print("language post")
