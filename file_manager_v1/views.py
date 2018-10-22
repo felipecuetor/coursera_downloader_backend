@@ -126,6 +126,31 @@ class SpecificLessonTagsView(APIView):
         print json_response
         return Response(json_response)
 
+class LessonListTagsView(APIView):
+    #Retrieve, update or delete a Lesson_Tag instance.
+    def get_all_lesson_tags(self, lesson_id):
+        try:
+            return Lesson_Tag.objects.filter(lesson_id_number=lesson_id)
+        except:
+            raise Http404
+
+    def get(self, request, format=None):
+        course_id = request.GET.get('course_id')
+        all_course_lessons = Lesson.objects.all().filter(course_id=course_id).values()
+        course_json_response={}
+        for lesson_obj in all_course_lessons:
+            lesson_x_tag = self.get_all_lesson_tags(lesson_obj["id"])
+            json_response=[]
+            for tag in lesson_x_tag.values():
+                tag_query=Tag.objects.filter(id=tag["tag_id_number"])
+                tag_object={
+                    "id":tag["id"],
+                    "tag_name":tag_query.values()[0]["tag_name"]
+                }
+                json_response.append(tag_object)
+            course_json_response[lesson_obj["id"]]=json_response
+        return Response(course_json_response)
+
 class SpecificCourseLanguagesView(APIView):
     """
     Retrieve, update or delete a Course_Tag instance.
@@ -256,6 +281,8 @@ class SetNextLessonDetail(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')

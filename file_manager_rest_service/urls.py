@@ -46,4 +46,5 @@ urlpatterns = [
     url(r'^set_next_lesson/', views.SetNextLessonDetail.as_view()),
     url(r'^lesson_files/', views.SpecificLessonFilesView.as_view()),
     url(r'^course_toggle_revised/', views.SpecificCourseToggleRevised.as_view()),
+    url(r'^course_tags/', views.LessonListTagsView.as_view()),
 ]
