@@ -238,10 +238,7 @@ class CourseLessonsDetail(APIView):
     def get(self, request, format=None):
         course_id = request.GET.get('course_id')
         all_course_lessons = Lesson.objects.all().filter(course_id=course_id).values()
-        serialized_lesson_list = []
-        for lesson in all_course_lessons:
-            serialized_lesson_list.append(LessonSerializer(lesson).data)
-        return Response(serialized_lesson_list)
+        return Response(all_course_lessons.values())
 
 class SetNextLessonDetail(APIView):
     def get(self, request, format=None):
