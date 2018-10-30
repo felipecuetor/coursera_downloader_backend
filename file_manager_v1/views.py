@@ -120,7 +120,8 @@ class SpecificLessonTagsView(APIView):
             tag_query=Tag.objects.filter(id=tag["tag_id_number"])
             tag_object={
                 "id":tag["id"],
-                "tag_name":tag_query.values()[0]["tag_name"]
+                "tag_name":tag_query.values()[0]["tag_name"],
+                "tag_id_number":tag["tag_id_number"]
             }
             json_response.append(tag_object)
         print json_response
@@ -145,10 +146,12 @@ class LessonListTagsView(APIView):
                 tag_query=Tag.objects.filter(id=tag["tag_id_number"])
                 tag_object={
                     "id":tag["id"],
-                    "tag_name":tag_query.values()[0]["tag_name"]
+                    "tag_name":tag_query.values()[0]["tag_name"],
+                    "tag_id_number":tag["tag_id_number"]
                 }
                 json_response.append(tag_object)
             course_json_response[lesson_obj["id"]]=json_response
+
         return Response(course_json_response)
 
 class SpecificCourseLanguagesView(APIView):
