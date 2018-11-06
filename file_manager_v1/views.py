@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from django.shortcuts import render
 from django.contrib.auth.models import User,Group
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -11,8 +12,18 @@ from file_manager_v1.models import File, Tag, Lesson_Tag, Course, CourseLanguage
 from file_manager_v1.serializers import LessonSerializer, UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Lesson_TagSerializer, CourseSerializer,CourseLanguageSerializer
 from utils.file_manager_utils import directory_recursive_generator
 import json
+import os
+import zipfile
+import datetime
+import shutil
 
 # Create your views here.
+
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file))
 
 class FileDetail(APIView):
     """
@@ -285,6 +296,62 @@ class SetNextLessonDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class DownloadCourseLanguageContents(APIView):
+
+        def get(self, request, format=None):
+            course_id = request.GET.get('course_id')
+            language = request.GET.get('language')
+            file_list = []
+            course = Course.objects.filter(id = course_id)[0]
+            course_lessons = Lesson.objects.filter(course_id = course_id)
+            dict_course_lessons = {}
+            current_lesson_head = None
+            for lesson in course_lessons:
+                dict_course_lessons[lesson.next_lesson_id]=lesson
+                if lesson.next_lesson_id == 0:
+                    current_lesson_head = lesson
+            ordered_course_lessons=[]
+            head_found = False
+            while not head_found:
+                ordered_course_lessons.insert(0, current_lesson_head)
+                if current_lesson_head.id in dict_course_lessons:
+                    current_lesson_head = dict_course_lessons[current_lesson_head.id]
+                else:
+                    head_found = True
+
+            current_time=str(datetime.datetime.now().date())+'-'+str(datetime.datetime.now().time())
+            zipPath = './zipped/course:'+course.course_name+'-'+language+'-'+current_time+'.zip'
+            #zipf = zipfile.ZipFile(zipPath, 'w', zipfile.ZIP_DEFLATED)
+            export_dir = "./"+course.course_name+"-export"
+            os.mkdir(export_dir)
+            current_lesson_position = 1
+            for lesson in ordered_course_lessons:
+                lesson_tags = Lesson_Tag.objects.filter(lesson_id_number=lesson.id)
+                exclude = False
+                for lesson_tag in lesson_tags:
+                    tag_id = lesson_tag.tag_id_number
+                    tag = Tag.objects.filter(id=tag_id)
+                    if(tag[0].tag_name == "Exclude"):
+                        exclude = True
+                if not exclude:
+                    os.mkdir(export_dir+"/"+str(current_lesson_position))
+                    lesson_files = File.objects.filter(lesson_id=lesson.id)
+                    for file in lesson_files:
+                        file_meta = file.file_name.split(".")
+                        if not file.file_directory.endswith(".mp4") and (len(file_meta)<2 or (language=="all" or (language in file.file_name))):
+                            file_path_fixed="./data/"+file.file_directory.replace(">>>","/")
+                            shutil.copyfile(file_path_fixed, export_dir+"/"+str(current_lesson_position)+"/"+file.file_name)
+                            #zipf.write(os.path.join("./",file_path_fixed))
+                    current_lesson_position=current_lesson_position+1
+            zipf = zipfile.ZipFile(zipPath, 'w', zipfile.ZIP_DEFLATED)
+            zipdir(export_dir, zipf)
+            zipf.close()
+            #open(zipPath,'r')
+            response = HttpResponse(open(zipPath,"r"), content_type="application/zip; boundary=something")
+            os.remove(zipPath)
+            shutil.rmtree(export_dir)
+            return response
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):

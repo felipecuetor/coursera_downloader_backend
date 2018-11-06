@@ -47,4 +47,5 @@ urlpatterns = [
     url(r'^lesson_files/', views.SpecificLessonFilesView.as_view()),
     url(r'^course_toggle_revised/', views.SpecificCourseToggleRevised.as_view()),
     url(r'^course_tags/', views.LessonListTagsView.as_view()),
+    url(r'^download_course_language_contents/', views.DownloadCourseLanguageContents.as_view()),
 ]

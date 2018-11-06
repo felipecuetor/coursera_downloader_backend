@@ -114,3 +114,4 @@ dmypy.json
 .data_backup/
 *.json
 *.conf
+*.zip
