@@ -27,6 +27,8 @@ router.register(r'lesson_x_tag', views.Lesson_TagViewSet)
 router.register(r'courses', views.CourseViewSet)
 router.register(r'courselanguage', views.CourseLanguageViewSet)
 router.register(r'lesson', views.LessonViewSet)
+router.register(r'lesson_x_concept', views.LessonConceptViewSet)
+
 
 urlpatterns = [
     url(r'^', include(router.urls)),
@@ -48,4 +50,5 @@ urlpatterns = [
     url(r'^course_toggle_revised/', views.SpecificCourseToggleRevised.as_view()),
     url(r'^course_tags/', views.LessonListTagsView.as_view()),
     url(r'^download_course_language_contents/', views.DownloadCourseLanguageContents.as_view()),
+    url(r'^lesson_concepts/', views.LessonConceptsDetail.as_view()),
 ]

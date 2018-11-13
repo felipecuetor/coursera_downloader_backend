@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from file_manager_v1.models import File, Tag, Lesson_Tag, Course, CourseLanguage, Lesson
+from file_manager_v1.models import File, Tag, Lesson_Tag, Course, CourseLanguage, Lesson, Lesson_Concept
 from rest_framework import serializers
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -42,3 +42,8 @@ class LessonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Lesson
         fields = ('id','lesson_name','lesson_identifier','next_lesson_id','course_id')
+
+class LessonConceptSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model=Lesson_Concept
+        field = ('id','lesson_id_number','concept_uri')

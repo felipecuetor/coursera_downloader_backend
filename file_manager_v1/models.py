@@ -58,7 +58,6 @@ class CourseLanguage(models.Model):
         unique_together = (("course_id", "language"),)
 
 
-#File group
 class Lesson(models.Model):
     #The name of the lesson
     lesson_name = models.CharField(max_length=500)
@@ -68,3 +67,9 @@ class Lesson(models.Model):
     next_lesson_id = models.IntegerField()
     #The course the lesson is associated to
     course_id = models.IntegerField()
+
+class Lesson_Concept(models.Model):
+    #Lesson conected to concept
+    lesson_id_number = models.IntegerField()
+    #concept uri
+    concept_uri = models.CharField(max_length=500)
