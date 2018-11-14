@@ -8,8 +8,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from file_manager_v1.models import File, Tag, Lesson_Tag, Course, CourseLanguage, Lesson, Lesson_Concept
-from file_manager_v1.serializers import LessonSerializer, UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Lesson_TagSerializer, CourseSerializer,CourseLanguageSerializer, LessonConceptSerializer
+from file_manager_v1.models import File, Tag, Lesson_Tag, Course, CourseLanguage, Lesson, Lesson_Concept, Concept
+from file_manager_v1.serializers import LessonSerializer, UserSerializer, GroupSerializer, FileSerializer, TagSerializer, Lesson_TagSerializer, CourseSerializer,CourseLanguageSerializer, LessonConceptSerializer, ConceptSerializer
 from utils.file_manager_utils import directory_recursive_generator
 import json
 import os
@@ -365,6 +365,28 @@ class LessonConceptsDetail(APIView):
         all_lesson_concepts = Lesson_Concept.objects.all().filter(lesson_id_number=lesson_id)
         return Response(all_lesson_concepts.values())
 
+class ConceptSearch(APIView):
+    """
+    Retrieve, update or delete the complete directory of files
+    """
+    def get(self, request, format=None):
+        search_query = request.GET.get('search_query')
+        concept_search = []
+        concept_query_1 = Concept.objects.raw('SELECT * FROM file_manager_v1_concept WHERE concept_label == \''+search_query+'\' limit 5;')
+        concept_query_2 = Concept.objects.raw('SELECT * FROM file_manager_v1_concept WHERE concept_label like \''+search_query+'%\' limit 20;')
+        concept_query_3 = Concept.objects.raw('SELECT * FROM file_manager_v1_concept WHERE concept_label like \'%'+search_query+'%\' limit 20;')
+        for concept in concept_query_1:
+            print concept.concept_label
+            concept_search.append(concept)
+        for concept in concept_query_2:
+            print concept.concept_label
+            concept_search.append(concept)
+        for concept in concept_query_3:
+            print concept.concept_label
+            concept_search.append(concept)
+        concept_search = {"data":concept_search}
+        print concept_search
+        return Response(concept_search)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
@@ -401,3 +423,7 @@ class LessonViewSet(viewsets.ModelViewSet):
 class LessonConceptViewSet(viewsets.ModelViewSet):
     queryset = Lesson_Concept.objects.all()
     serializer_class = LessonConceptSerializer
+
+class ConceptViewSet(viewsets.ModelViewSet):
+    queryset = Concept.objects.all()
+    serializer_class = ConceptSerializer

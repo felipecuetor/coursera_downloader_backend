@@ -68,6 +68,13 @@ class Lesson(models.Model):
     #The course the lesson is associated to
     course_id = models.IntegerField()
 
+class Concept(models.Model):
+    concept_uri = models.CharField(max_length=500, unique=True)
+    concept_uri_alternate = models.CharField(max_length=500)
+    concept_label = models.CharField(max_length=100)
+    concept_language = models.CharField(max_length=10)
+
+
 class Lesson_Concept(models.Model):
     #Lesson conected to concept
     lesson_id_number = models.IntegerField()
