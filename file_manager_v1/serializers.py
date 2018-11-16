@@ -46,7 +46,7 @@ class LessonSerializer(serializers.HyperlinkedModelSerializer):
 class LessonConceptSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model=Lesson_Concept
-        fields = ('id','lesson_id_number','concept_uri')
+        fields = ('id','lesson_id_number','concept_id_number')
 
 class ConceptSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

@@ -79,4 +79,6 @@ class Lesson_Concept(models.Model):
     #Lesson conected to concept
     lesson_id_number = models.IntegerField()
     #concept uri
-    concept_uri = models.CharField(max_length=500)
+    concept_id_number = models.IntegerField()
+    class Meta:
+        unique_together = (("lesson_id_number", "concept_id_number"),)

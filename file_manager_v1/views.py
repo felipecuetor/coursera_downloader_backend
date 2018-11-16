@@ -363,6 +363,8 @@ class LessonConceptsDetail(APIView):
     def get(self, request, format=None):
         lesson_id = request.GET.get('lesson_id')
         all_lesson_concepts = Lesson_Concept.objects.all().filter(lesson_id_number=lesson_id)
+        for concept_con in all_lesson_concepts:
+            concept = Concept.objects.filter(id = concept_con.concept_id_number)
         return Response(all_lesson_concepts.values())
 
 class ConceptSearch(APIView):
@@ -376,14 +378,29 @@ class ConceptSearch(APIView):
         concept_query_2 = Concept.objects.raw('SELECT * FROM file_manager_v1_concept WHERE concept_label like \''+search_query+'%\' limit 20;')
         concept_query_3 = Concept.objects.raw('SELECT * FROM file_manager_v1_concept WHERE concept_label like \'%'+search_query+'%\' limit 20;')
         for concept in concept_query_1:
-            print concept.concept_label
-            concept_search.append(concept)
+            concept_obj = {}
+            concept_obj["concept_label"] = concept.concept_label
+            concept_obj["concept_uri"] = concept.concept_uri
+            concept_obj["concept_uri_alternate"] = concept.concept_uri_alternate
+            concept_obj["concept_language"] = concept.concept_language
+            if concept_obj not in concept_search:
+                concept_search.append(concept_obj)
         for concept in concept_query_2:
-            print concept.concept_label
-            concept_search.append(concept)
+            concept_obj = {}
+            concept_obj["concept_label"] = concept.concept_label
+            concept_obj["concept_uri"] = concept.concept_uri
+            concept_obj["concept_uri_alternate"] = concept.concept_uri_alternate
+            concept_obj["concept_language"] = concept.concept_language
+            if concept_obj not in concept_search:
+                concept_search.append(concept_obj)
         for concept in concept_query_3:
-            print concept.concept_label
-            concept_search.append(concept)
+            concept_obj = {}
+            concept_obj["concept_label"] = concept.concept_label
+            concept_obj["concept_uri"] = concept.concept_uri
+            concept_obj["concept_uri_alternate"] = concept.concept_uri_alternate
+            concept_obj["concept_language"] = concept.concept_language
+            if concept_obj not in concept_search:
+                concept_search.append(concept_obj)
         concept_search = {"data":concept_search}
         print concept_search
         return Response(concept_search)
