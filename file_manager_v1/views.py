@@ -363,9 +363,11 @@ class LessonConceptsDetail(APIView):
     def get(self, request, format=None):
         lesson_id = request.GET.get('lesson_id')
         all_lesson_concepts = Lesson_Concept.objects.all().filter(lesson_id_number=lesson_id)
+        concepts = []
         for concept_con in all_lesson_concepts:
             concept = Concept.objects.filter(id = concept_con.concept_id_number)
-        return Response(all_lesson_concepts.values())
+            concepts.append(concept.values()[0])
+        return Response({"data":concepts})
 
 class ConceptSearch(APIView):
     """
