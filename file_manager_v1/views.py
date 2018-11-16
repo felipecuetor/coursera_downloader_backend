@@ -379,6 +379,7 @@ class ConceptSearch(APIView):
         concept_query_3 = Concept.objects.raw('SELECT * FROM file_manager_v1_concept WHERE concept_label like \'%'+search_query+'%\' limit 20;')
         for concept in concept_query_1:
             concept_obj = {}
+            concept_obj["id"] = concept.id
             concept_obj["concept_label"] = concept.concept_label
             concept_obj["concept_uri"] = concept.concept_uri
             concept_obj["concept_uri_alternate"] = concept.concept_uri_alternate
@@ -387,6 +388,7 @@ class ConceptSearch(APIView):
                 concept_search.append(concept_obj)
         for concept in concept_query_2:
             concept_obj = {}
+            concept_obj["id"] = concept.id
             concept_obj["concept_label"] = concept.concept_label
             concept_obj["concept_uri"] = concept.concept_uri
             concept_obj["concept_uri_alternate"] = concept.concept_uri_alternate
@@ -395,6 +397,7 @@ class ConceptSearch(APIView):
                 concept_search.append(concept_obj)
         for concept in concept_query_3:
             concept_obj = {}
+            concept_obj["id"] = concept.id
             concept_obj["concept_label"] = concept.concept_label
             concept_obj["concept_uri"] = concept.concept_uri
             concept_obj["concept_uri_alternate"] = concept.concept_uri_alternate
