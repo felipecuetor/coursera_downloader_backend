@@ -29,7 +29,7 @@ pytz==2018.3
 pywin32-ctypes==0.1.2
 query-string==1.0.2
 request==1.0.2
-requests==2.19.1
+requests==2.20.0
 threader==0.1.1
 urllib3==1.23
 six>=1.5.0
