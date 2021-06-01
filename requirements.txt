@@ -31,6 +31,6 @@ query-string==1.0.2
 request==1.0.2
 requests==2.20.0
 threader==0.1.1
-urllib3==1.24.2
+urllib3==1.26.5
 six>=1.5.0
 attrs==18.1.0
